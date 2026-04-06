@@ -32,9 +32,10 @@ stages:
 
     - script: |
         python -m pip install --upgrade pip
-        pip install Flask pytest bandit pytest-azurepipelines
-        pip install -r requirements.txt
+        pip install Flask pytest bandit pytest-azurepipelines --index-url https://pypi.org/simple
+        pip install -r requirements.txt --extra-index-url https://pkgs.dev.azure.com/bdanailov36/_packaging/bdanailov36/pypi/simple
       displayName: 'Install dependencies'
+      
     # Session 5: Functional Testing
     - script: |
         pip install pytest pytest-azurepipelines
