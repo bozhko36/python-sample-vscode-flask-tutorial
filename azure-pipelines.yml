@@ -75,8 +75,8 @@ stages:
             displayName: 'Build and Push Docker Image'
             inputs:
               containerRegistry: 'MyDockerConn'
-              # CHANGE THIS LINE: add your Docker ID followed by a slash
-              repository: 'bdanailov36/python-flask-app' 
+              # Use the ID shown in your screenshot
+              repository: 'bozhko36/python-flask-app' 
               command: 'buildAndPush'
               Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
               tags: |
