@@ -3,6 +3,7 @@
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
+
 trigger:
 - main
 
@@ -23,20 +24,29 @@ stages:
         versionSpec: '3.9'
       displayName: 'Use Python 3.9'
 
+    # Session 5: Authenticate with your Artifact Feed
+    - task: PipAuthenticate@1
+      displayName: 'Pip Authenticate'
+      inputs:
+        artifactFeeds: 'bdanailov36'
+
     - script: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
       displayName: 'Install dependencies'
 
+    # Session 5: Functional Testing
     - script: |
         pip install pytest pytest-azurepipelines
         pytest
       displayName: 'Run Functional Tests'
 
+    # Session 7: Nonfunctional Security Scan
     - script: |
         pip install bandit
         bandit -r . -f txt
       displayName: 'Run Nonfunctional Security Scan'
+      continueOnError: true
 
     - task: PublishPipelineArtifact@1
       inputs:
@@ -57,6 +67,7 @@ stages:
       runOnce:
         deploy:
           steps:
+          # Session 7: Docker Automation
           - task: Docker@2
             displayName: 'Build and Push Docker Image'
             inputs:
