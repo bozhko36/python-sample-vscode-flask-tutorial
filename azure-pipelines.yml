@@ -24,17 +24,17 @@ stages:
         versionSpec: '3.9'
       displayName: 'Use Python 3.9'
 
-    # Session 5: Authenticate with your Artifact Feed
     - task: PipAuthenticate@1
       displayName: 'Pip Authenticate'
       inputs:
         artifactFeeds: 'bdanailov36'
+        onlyCheckSecondaryRepos: true
 
     - script: |
         python -m pip install --upgrade pip
+        pip install Flask pytest bandit pytest-azurepipelines
         pip install -r requirements.txt
       displayName: 'Install dependencies'
-
     # Session 5: Functional Testing
     - script: |
         pip install pytest pytest-azurepipelines
