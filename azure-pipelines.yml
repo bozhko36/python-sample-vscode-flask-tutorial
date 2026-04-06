@@ -14,7 +14,7 @@ variables:
 
 stages:
 - stage: Build
-  displayName: 'Build and Test Stage'
+  displayName: 'Build and Quality Stage'
   jobs:
   - job: BuildJob
     steps:
@@ -31,7 +31,12 @@ stages:
     - script: |
         pip install pytest pytest-azurepipelines
         pytest
-      displayName: 'Run Quality Tests'
+      displayName: 'Run Functional Tests'
+
+    - script: |
+        pip install bandit
+        bandit -r . -f txt
+      displayName: 'Run Nonfunctional Security Scan'
 
     - task: PublishPipelineArtifact@1
       inputs:
@@ -41,7 +46,7 @@ stages:
       displayName: 'Publish Build Artifacts'
 
 - stage: Deploy
-  displayName: 'Release Stage'
+  displayName: 'Release and Docker Stage'
   dependsOn: Build
   condition: succeeded()
   jobs:
@@ -52,5 +57,13 @@ stages:
       runOnce:
         deploy:
           steps:
-          - script: echo "Releasing application..."
-            displayName: 'Finalize Release'
+          - task: Docker@2
+            displayName: 'Build and Push Docker Image'
+            inputs:
+              containerRegistry: 'YourServiceConnectionName'
+              repository: 'python-flask-app'
+              command: 'buildAndPush'
+              Dockerfile: '**/Dockerfile'
+              tags: |
+                $(Build.BuildId)
+                latest
