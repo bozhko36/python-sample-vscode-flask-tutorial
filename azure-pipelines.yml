@@ -24,6 +24,7 @@ stages:
         versionSpec: '3.9'
       displayName: 'Use Python 3.9'
 
+    # Session 5: Authenticate with your Artifact Feed
     - task: PipAuthenticate@1
       displayName: 'Pip Authenticate'
       inputs:
@@ -35,15 +36,15 @@ stages:
         pip install Flask pytest bandit pytest-azurepipelines --index-url https://pypi.org/simple
         pip install -r requirements.txt --extra-index-url https://pkgs.dev.azure.com/bdanailov36/_packaging/bdanailov36/pypi/simple
       displayName: 'Install dependencies'
-      
+
+    # Session 5: Functional Testing
     - script: |
-        pip install pytest pytest-azurepipelines
         pytest
       displayName: 'Run Functional Tests'
 
+    # Session 7: Nonfunctional Security Scan
     - script: |
-        pip install bandit
-        bandit -r . -f txt -ll  # The -ll flag means "Level Low" and above, but won't exit with error 1 for Low
+        bandit -r . -f txt -ll
       displayName: 'Run Nonfunctional Security Scan'
       continueOnError: true
 
@@ -66,13 +67,17 @@ stages:
       runOnce:
         deploy:
           steps:
+          # Crucial: This pulls the Dockerfile from GitHub into the Deploy agent
+          - checkout: self 
+
+          # Session 7: Docker Automation
           - task: Docker@2
             displayName: 'Build and Push Docker Image'
             inputs:
               containerRegistry: 'MyDockerConn'
               repository: 'python-flask-app'
               command: 'buildAndPush'
-              Dockerfile: '$(Build.SourcesDirectory)/Dockerfile' 
+              Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
               tags: |
                 $(Build.BuildId)
                 latest
